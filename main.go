@@ -2,13 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
-// Person is ..
+// Person ...
 type Person struct {
 	ID        string   `json:"id,omitempty"`
 	Firstname string   `json:"firstname,omitempty"`
@@ -16,13 +16,17 @@ type Person struct {
 	Address   *Address `json:"address,omitempty"`
 }
 
-// Address is ..
+// Address ...
 type Address struct {
 	City  string `json:"city,omitempty"`
 	State string `json:"state,omitempty"`
 }
 
 var people []Person
+
+func getPeopleEndpoint(w http.ResponseWriter, req *http.Request) {
+	json.NewEncoder(w).Encode(&people)
+}
 
 func getPersonEndpoint(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
@@ -35,34 +39,26 @@ func getPersonEndpoint(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(&Person{})
 }
 
-func getPeopleEndpoint(w http.ResponseWriter, req *http.Request) {
-	json.NewEncoder(w).Encode(people)
-}
-
 func createPersonEndpoint(w http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
 	var person Person
 	_ = json.NewDecoder(req.Body).Decode(&person)
-	person.ID = params["id"] // Should auto generate
+	person.ID = fmt.Sprintf("%d", len(people)+1)
 	people = append(people, person)
 	json.NewEncoder(w).Encode(person)
 }
 
 func deletePersonEndpoint(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
-
 	for index, item := range people {
 		if item.ID == params["id"] {
 			people = append(people[:index], people[index+1:]...)
-			break
 		}
 	}
 	json.NewEncoder(w).Encode(people)
 }
 
 func main() {
-	println("My First Small Project in Go!")
-
+	println("Recoding the REST API in 5 minutes")
 	router := mux.NewRouter()
 
 	people = append(people, Person{ID: "1", Firstname: "Alex", Lastname: "Lee", Address: &Address{City: "Ho Chi Minh", State: "Tan Phu"}})
@@ -70,8 +66,31 @@ func main() {
 
 	router.HandleFunc("/people", getPeopleEndpoint).Methods("GET")
 	router.HandleFunc("/people/{id}", getPersonEndpoint).Methods("GET")
-	router.HandleFunc("/people/{id}", createPersonEndpoint).Methods("POST")
+	router.HandleFunc("/people/add", createPersonEndpoint).Methods("POST")
 	router.HandleFunc("/people/{id}", deletePersonEndpoint).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8888", router))
 }
+
+/*
+Get people list:
+	GET http://localhost:8888/people
+
+Get person:
+	GET http://localhost:8888/people/1
+
+Create person:
+	POST http://localhost:8888/people/add
+
+	JSON Body
+	{
+		"firstname": "Hung",
+		"lastname": "Tran",
+		"address": {
+			"city": "Seatle",
+			"state": "Silicon Valey"
+		}
+	}
+
+Detelet DELETE http://localhost:8888/people/3
+*/
