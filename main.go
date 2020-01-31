@@ -93,4 +93,19 @@ Create person:
 	}
 
 Detelet DELETE http://localhost:8888/people/3
+
+TEST COMMANDS:
+
+Get people
+~/ curl localhost:8888/people
+
+Get person detail
+~/ curl localhost:8888/person/2
+
+Create new person
+~/ curl -XPOST -d '{"Firstname":"ABC", "Lastname":"Tran", "Address": {"city": "HCM", "state":"hcm"}}' localhost:8888/people/add
+
+Delete person
+~/ curl -XDELETE localhost:8888/people/3
+
 */
