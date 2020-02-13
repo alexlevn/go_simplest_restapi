@@ -252,4 +252,18 @@ TEST
 
 	Get Detail User
 	~ curl localhost:8080/user\?email=thanhdungfb@gmail.com
+
+Test with Insomidia
+	1.
+	POST : localhost:8080/register
+	BODY JSON:
+	{
+		"email":"thanhdungfb@gmail.com",
+		"Name":"Alex Lee"
+	}
+
+	2.
+	GET: localhost:8080/user\?email=thanhdungfb@gmail.com
+
+	(Input the param in the Query Params)
 */
